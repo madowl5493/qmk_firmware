@@ -29,11 +29,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,--------------------------------------------.                    ,--------------------------------------------.
       KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,   KC_I,     KC_O,     KC_P,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
-      KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,   KC_K,     KC_L,    KC_SCLN,
+      KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,   KC_K,     KC_L,    MT(KC_LALT, KC_SCLN),
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
       KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M,   KC_LCTL,  KC_TAB, KC_ESC,
   //|--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------|
-                                  TG(1), KC_LSFT,  KC_ENT,     KC_BSPC, KC_SPC,  KC_LALT
+                                  MO(1), KC_LGUI,  KC_ENT,     KC_BSPC, KC_SPC,  KC_LSFT
                              //`--------------------------'  `--------------------------'
 
   ),
@@ -42,11 +42,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,--------------------------------------------.                    ,--------------------------------------------.
        KC_1,    KC_2,    KC_3,  KC_4,    KC_5,                          KC_GRV, KC_QUOT,  KC_NUBS, KC_BSLS, KC_NUHS,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
-       KC_6,    KC_7,    KC_8,  KC_9,    KC_0,                          KC_LEFT, KC_DOWN, KC_UP,  KC_RIGHT, _______,
+       KC_6,    KC_7,    KC_8,  KC_9,    KC_0,                          KC_LEFT, KC_DOWN, KC_UP,  KC_RIGHT, KC_LALT,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
-      KC_SLSH, KC_EQL, KC_MINS,  KC_LBRC, KC_RBRC,                      KC_COMM, KC_DOT, _______, _______, _______,
+      KC_SLSH, KC_EQL, KC_MINS,  KC_LBRC, KC_RBRC,                      KC_COMM, KC_DOT, _______, _______, MO(2),
   //|--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------|
-                                 KC_TRNS, _______,  _______,     _______,   KC_SPC, MO(2)
+                                KC_TRNS, _______, _______,    _______,  _______,  _______
                              //`--------------------------'  `--------------------------'
   ),
 
@@ -56,18 +56,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
        KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,                       KC_HOME, KC_PGDN, KC_PGUP, RGB_HUI,  RGB_SAI,
   //|--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------|
-       KC_F11,  KC_F12, XXXXXXX, XXXXXXX, RGB_MOD,                      XXXXXXX, XXXXXXX, XXXXXXX, RGB_HUD,  RGB_SAD,
+       KC_F11,  KC_F12, XXXXXXX, XXXXXXX, RGB_MOD,                      XXXXXXX, RGB_SAI, RGB_SAD, RGB_HUD,  KC_TRNS,
   //|--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------|
-                                XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, KC_TRNS
+                                XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, _______
                              //`--------------------------'  `--------------------------'
   )
 };
 
 const rgblight_segment_t PROGMEM layer1[] = RGBLIGHT_LAYER_SEGMENTS(
-    {14, 1, HSV_PURPLE},
-    {1, 5, HSV_PURPLE},
-    {0, 1, HSV_PURPLE},
-    {27, 6, HSV_PURPLE}
+    {14, 1, HSV_GREEN},
+    {1, 5, HSV_GREEN},
+    {0, 1, HSV_GREEN},
+    {27, 6, HSV_GREEN}
 );
 
 // Now define the array of layers. Later layers take precedence
