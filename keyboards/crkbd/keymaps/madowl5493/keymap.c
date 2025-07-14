@@ -37,22 +37,18 @@ typedef struct {
 
 // Tap Dance declarations
 enum {
-    TD_SPC_TG1,
-    TD_ENT_TG2,
-    TD_HYPR_CAPS
+    TD_ESC_TG2,
+    TD_HYPR_CAPS,
+    TD_TAB_TO1
 };
 
 td_state_t cur_dance(tap_dance_state_t *state);
 
-// For the hypr tap dance. Put it here so it can be used in any keymap
 void hypr_finished(tap_dance_state_t *state, void *user_data);
 void hypr_reset(tap_dance_state_t *state, void *user_data);
-// For the ent tap dance. Put it here so it can be used in any keymap
-void ent_finished(tap_dance_state_t *state, void *user_data);
-void ent_reset(tap_dance_state_t *state, void *user_data);
-// For the spc tap dance. Put it here so it can be used in any keymap
-void spc_finished(tap_dance_state_t *state, void *user_data);
-void spc_reset(tap_dance_state_t *state, void *user_data);
+
+void tab_finished(tap_dance_state_t *state, void *user_data);
+void tab_reset(tap_dance_state_t *state, void *user_data);
 
 enum layers {
     _DEFAULT,
@@ -69,7 +65,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
             KC_Z,                   KC_X,                 KC_C,                 KC_V,                 KC_B,                                          KC_N,                  KC_M,                KC_COMM,               KC_DOT,             KC_QUOT,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
-                                                                                                     KC_ESC, TD(TD_HYPR_CAPS),  KC_TAB,     TD(TD_ENT_TG2),  TD(TD_SPC_TG1), KC_BSPC
+                                                                                     TD(TD_ESC_TG2), TD(TD_HYPR_CAPS),  TD(TD_TAB_TO1),     KC_ENT,  KC_SPC, KC_BSPC
                                                                                                  //`--------------------------'  `--------------------------'
 
   ),
@@ -191,7 +187,7 @@ bool led_update_user(led_t led_state) {
 
 td_state_t cur_dance(tap_dance_state_t *state) {
     if (state->count == 1) {
-        if (state->interrupted || !state->pressed) return TD_SINGLE_TAP;
+        if (!state->pressed) return TD_SINGLE_TAP;
         // Key has not been interrupted, but the key is still held. Means you want to send a 'HOLD'.
         else return TD_SINGLE_HOLD;
     } else if (state->count == 2) {
@@ -214,6 +210,11 @@ td_state_t cur_dance(tap_dance_state_t *state) {
 
 // Create an instance of 'td_tap_t' for the 'x' tap dance.
 static td_tap_t hyprtap_state = {
+    .is_press_action = true,
+    .state = TD_NONE
+};
+
+static td_tap_t tabtap_state = {
     .is_press_action = true,
     .state = TD_NONE
 };
@@ -249,11 +250,41 @@ void hypr_reset(tap_dance_state_t *state, void *user_data) {
     hyprtap_state.state = TD_NONE;
 }
 
+void tab_finished(tap_dance_state_t *state, void *user_data) {
+    tabtap_state.state = cur_dance(state);
+    switch (tabtap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_TAB);
+            break;
+        case TD_SINGLE_HOLD:
+            layer_lock_on(1);
+            break;
+        case TD_DOUBLE_SINGLE_TAP:
+            tap_code(KC_TAB);
+            tap_code(KC_TAB);
+            break;
+        default: break;
+    }
+}
+
+void tab_reset(tap_dance_state_t *state, void *user_data) {
+    switch (tabtap_state.state) {
+        case TD_SINGLE_HOLD:
+            layer_lock_off(1);
+            break;
+        case TD_DOUBLE_TAP:
+            layer_lock_invert(1);
+            break;
+        default: break;
+    }
+    tabtap_state.state = TD_NONE;
+}
+
 // Tap Dance definitions
 tap_dance_action_t tap_dance_actions[] = {
     // Tap once for Space, twice for toggle Layer 1
-    [TD_SPC_TG1] = ACTION_TAP_DANCE_LAYER_TOGGLE(KC_SPC, 1),
-    [TD_ENT_TG2] = ACTION_TAP_DANCE_LAYER_TOGGLE(KC_ENT, 2),
+    [TD_ESC_TG2] = ACTION_TAP_DANCE_LAYER_TOGGLE(KC_ESC, 2),
+    [TD_TAB_TO1] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, tab_finished, tab_reset),
     [TD_HYPR_CAPS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, hypr_finished, hypr_reset)
 };
 
