@@ -37,7 +37,7 @@ typedef struct {
 
 // Tap Dance declarations
 enum {
-    TD_ESC_TG2,
+    TD_ESC_TO1_TG2,
     TD_HYPR_CAPS,
     TD_TAB_TO1
 };
@@ -65,7 +65,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
             KC_Z,                   KC_X,                 KC_C,                 KC_V,                 KC_B,                                          KC_N,                  KC_M,                KC_COMM,               KC_DOT,             KC_QUOT,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
-                                                                                     TD(TD_ESC_TG2), TD(TD_HYPR_CAPS),  TD(TD_TAB_TO1),     KC_ENT,  KC_SPC, KC_BSPC
+                                                                                     TD(TD_ESC_TO1_TG2), TD(TD_HYPR_CAPS),  TD(TD_TAB_TO1),     KC_ENT,  KC_SPC, KC_BSPC
                                                                                                  //`--------------------------'  `--------------------------'
 
   ),
@@ -76,7 +76,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
       MT(MOD_LSFT, KC_GRV),        KC_LCTL,             KC_LALT,              KC_LGUI,             XXXXXXX,                                      KC_LEFT,       MT(MOD_RGUI, KC_DOWN),  MT(MOD_RALT, KC_UP), MT(MOD_RCTL, KC_RIGHT),     KC_RSFT,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
-            XXXXXXX,                XXXXXXX,             XXXXXXX,                XXXXXXX,            XXXXXXX,                                        KC_MINS,               KC_EQL,              KC_LBRC,              KC_RBRC,           KC_SLSH,
+            KC_BSLS,                XXXXXXX,             XXXXXXX,                XXXXXXX,            XXXXXXX,                                        KC_MINS,               KC_EQL,              KC_LBRC,              KC_RBRC,           KC_SLSH,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
                                                                                                     KC_TRNS, KC_TRNS, KC_TRNS,    KC_TRNS,  KC_TRNS,  KC_TRNS
                                                                                                  //`--------------------------'  `--------------------------'
@@ -219,6 +219,11 @@ static td_tap_t tabtap_state = {
     .state = TD_NONE
 };
 
+static td_tap_t esctap_state = {
+    .is_press_action = true,
+    .state = TD_NONE
+};
+
 void hypr_finished(tap_dance_state_t *state, void *user_data) {
     hyprtap_state.state = cur_dance(state);
     switch (hyprtap_state.state) {
@@ -280,10 +285,44 @@ void tab_reset(tap_dance_state_t *state, void *user_data) {
     tabtap_state.state = TD_NONE;
 }
 
+void esc_finished(tap_dance_state_t *state, void *user_data) {
+    esctap_state.state = cur_dance(state);
+    switch (esctap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_ESC);
+        case TD_SINGLE_HOLD:
+            layer_lock_on(1);
+            add_mods(MOD_MASK_SHIFT);
+            break;
+        case TD_DOUBLE_TAP:
+            layer_lock_invert(2);
+            break;
+        case TD_DOUBLE_SINGLE_TAP:
+            tap_code(KC_ESC);
+            tap_code(KC_ESC);
+            break;
+        default: break;
+    }
+}
+
+void esc_reset(tap_dance_state_t *state, void *user_data) {
+    switch (esctap_state.state) {
+        case TD_SINGLE_HOLD:
+            layer_lock_off(1);
+            del_mods(MOD_MASK_SHIFT);
+            break;
+        case TD_DOUBLE_TAP:
+            layer_lock_invert(2);
+            break;
+        default: break;
+    }
+    esctap_state.state = TD_NONE;
+}
+
 // Tap Dance definitions
 tap_dance_action_t tap_dance_actions[] = {
     // Tap once for Space, twice for toggle Layer 1
-    [TD_ESC_TG2] = ACTION_TAP_DANCE_LAYER_TOGGLE(KC_ESC, 2),
+    [TD_ESC_TO1_TG2] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, esc_finished, esc_reset),
     [TD_TAB_TO1] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, tab_finished, tab_reset),
     [TD_HYPR_CAPS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, hypr_finished, hypr_reset)
 };
