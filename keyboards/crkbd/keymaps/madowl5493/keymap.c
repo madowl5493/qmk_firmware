@@ -61,11 +61,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-------------------------------------------------------------------------------------------------------------.                        ,-------------------------------------------------------------------------------------------------------------.
             KC_Q,                   KC_W,                 KC_E,                 KC_R,                 KC_T,                                          KC_Y,                  KC_U,                KC_I,                  KC_O,                  KC_P,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
-      MT(MOD_LSFT, KC_A),    MT(MOD_LCTL, KC_S),   MT(MOD_LALT, KC_D),   MT(MOD_LGUI, KC_F),           KC_G,                                          KC_H,         MT(MOD_RGUI, KC_J),     MT(MOD_LALT, KC_K),   MT(MOD_RCTL, KC_L),  MT(MOD_RSFT, KC_SCLN),
+      MT(MOD_LSFT, KC_A),    MT(MOD_LGUI, KC_S),   MT(MOD_LALT, KC_D),   MT(MOD_LCTL, KC_F),           KC_G,                                          KC_H,         MT(MOD_RCTL, KC_J),     MT(MOD_LALT, KC_K),   MT(MOD_RGUI, KC_L),  MT(MOD_RSFT, KC_SCLN),
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
-            KC_Z,                   KC_X,                 KC_C,                 KC_V,                 KC_B,                                          KC_N,                  KC_M,                KC_COMM,               KC_DOT,             KC_QUOT,
+            KC_Z,                   KC_X,                 KC_C,                 KC_V,                 KC_B,                                          KC_N,                  KC_M,                KC_COMM,               KC_DOT,             KC_SLSH,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
-                                                                                     TD(TD_ESC_TO1_TG2), TD(TD_HYPR_CAPS),  TD(TD_TAB_TO1),     KC_ENT,  KC_SPC, KC_BSPC
+                                                                            TD(TD_HYPR_CAPS), TD(TD_ESC_TO1_TG2), TD(TD_TAB_TO1),     KC_ENT,  KC_SPC, KC_BSPC
                                                                                                  //`--------------------------'  `--------------------------'
 
   ),
@@ -76,7 +76,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
       MT(MOD_LSFT, KC_GRV),        KC_LCTL,             KC_LALT,              KC_LGUI,             XXXXXXX,                                      KC_LEFT,       MT(MOD_RGUI, KC_DOWN),  MT(MOD_RALT, KC_UP), MT(MOD_RCTL, KC_RIGHT),     KC_RSFT,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
-            KC_BSLS,                XXXXXXX,             XXXXXXX,                XXXXXXX,            XXXXXXX,                                        KC_MINS,               KC_EQL,              KC_LBRC,              KC_RBRC,           KC_SLSH,
+            KC_BSLS,                XXXXXXX,             XXXXXXX,                XXXXXXX,            XXXXXXX,                                        KC_MINS,               KC_EQL,              KC_LBRC,              KC_RBRC,           KC_QUOT,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
                                                                                                     KC_TRNS, KC_TRNS, KC_TRNS,    KC_TRNS,  KC_TRNS,  KC_TRNS
                                                                                                  //`--------------------------'  `--------------------------'
@@ -266,7 +266,7 @@ void tab_finished(tap_dance_state_t *state, void *user_data) {
             break;
         case TD_DOUBLE_SINGLE_TAP:
             tap_code(KC_TAB);
-            tap_code(KC_TAB);
+            register_code(KC_TAB);
             break;
         default: break;
     }
@@ -280,6 +280,9 @@ void tab_reset(tap_dance_state_t *state, void *user_data) {
         case TD_DOUBLE_TAP:
             layer_lock_invert(1);
             break;
+        case TD_DOUBLE_SINGLE_TAP:
+            unregister_code(KC_TAB);
+            break;
         default: break;
     }
     tabtap_state.state = TD_NONE;
@@ -290,16 +293,14 @@ void esc_finished(tap_dance_state_t *state, void *user_data) {
     switch (esctap_state.state) {
         case TD_SINGLE_TAP:
             tap_code(KC_ESC);
+            break;
         case TD_SINGLE_HOLD:
             layer_lock_on(1);
             add_mods(MOD_MASK_SHIFT);
             break;
-        case TD_DOUBLE_TAP:
-            layer_lock_invert(2);
-            break;
         case TD_DOUBLE_SINGLE_TAP:
             tap_code(KC_ESC);
-            tap_code(KC_ESC);
+            register_code(KC_ESC);
             break;
         default: break;
     }
@@ -313,6 +314,9 @@ void esc_reset(tap_dance_state_t *state, void *user_data) {
             break;
         case TD_DOUBLE_TAP:
             layer_lock_invert(2);
+            break;
+        case TD_DOUBLE_SINGLE_TAP:
+            unregister_code(KC_ESC);
             break;
         default: break;
     }
