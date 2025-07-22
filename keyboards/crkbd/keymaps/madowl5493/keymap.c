@@ -231,7 +231,6 @@ void hypr_finished(tap_dance_state_t *state, void *user_data) {
         case TD_SINGLE_HOLD:
             add_mods(MOD_MASK_GUI | MOD_MASK_CTRL | MOD_MASK_SHIFT | MOD_MASK_ALT);
             break;
-        case TD_DOUBLE_TAP: tap_code(KC_CAPS); break;
         // case TD_DOUBLE_HOLD: register_code(KC_LALT); break;
         // Last case is for fast typing. Assuming your key is `f`:
         // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
@@ -250,6 +249,12 @@ void hypr_reset(tap_dance_state_t *state, void *user_data) {
         // case TD_DOUBLE_TAP: unregister_code(KC_CAPS); break;
         // case TD_DOUBLE_HOLD: unregister_code(KC_LALT); break;
         // case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_X); break;
+        case TD_DOUBLE_TAP:
+            layer_lock_invert(1);
+            break;
+        case TD_TRIPLE_TAP:
+            layer_lock_invert(2);
+            break;
         default: break;
     }
     hyprtap_state.state = TD_NONE;
@@ -276,9 +281,6 @@ void tab_reset(tap_dance_state_t *state, void *user_data) {
     switch (tabtap_state.state) {
         case TD_SINGLE_HOLD:
             layer_lock_off(1);
-            break;
-        case TD_DOUBLE_TAP:
-            layer_lock_invert(1);
             break;
         case TD_DOUBLE_SINGLE_TAP:
             unregister_code(KC_TAB);
@@ -311,9 +313,6 @@ void esc_reset(tap_dance_state_t *state, void *user_data) {
         case TD_SINGLE_HOLD:
             layer_lock_off(1);
             del_mods(MOD_MASK_SHIFT);
-            break;
-        case TD_DOUBLE_TAP:
-            layer_lock_invert(2);
             break;
         case TD_DOUBLE_SINGLE_TAP:
             unregister_code(KC_ESC);
