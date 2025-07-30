@@ -50,6 +50,9 @@ void hypr_reset(tap_dance_state_t *state, void *user_data);
 void tab_finished(tap_dance_state_t *state, void *user_data);
 void tab_reset(tap_dance_state_t *state, void *user_data);
 
+void esc_finished(tap_dance_state_t *state, void *user_data);
+void esc_reset(tap_dance_state_t *state, void *user_data);
+
 enum layers {
     _DEFAULT,
     _FIRST,
@@ -74,7 +77,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-------------------------------------------------------------------------------------------------------------.                         ,-------------------------------------------------------------------------------------------------------------.
             KC_1,                   KC_2,                 KC_3,                 KC_4,                 KC_5,                                          KC_6,                  KC_7,                KC_8,                 KC_9,                KC_0,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
-      MT(MOD_LSFT, KC_GRV),        KC_LCTL,             KC_LALT,              KC_LGUI,             XXXXXXX,                                      KC_LEFT,       MT(MOD_RGUI, KC_DOWN),  MT(MOD_RALT, KC_UP), MT(MOD_RCTL, KC_RIGHT),     KC_RSFT,
+      MT(MOD_LSFT, KC_GRV),        KC_LGUI,             KC_LALT,              KC_LCTL,             XXXXXXX,                                      KC_LEFT,       MT(MOD_RCTL, KC_DOWN),  MT(MOD_RALT, KC_UP), MT(MOD_RGUI, KC_RIGHT),     KC_RSFT,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
             KC_BSLS,                XXXXXXX,             XXXXXXX,                XXXXXXX,            XXXXXXX,                                        KC_MINS,               KC_EQL,              KC_LBRC,              KC_RBRC,           KC_QUOT,
   //|---------------------+---------------------+---------------------+---------------------+---------------------|                         |---------------------+---------------------+---------------------+---------------------+---------------------|
@@ -298,7 +301,7 @@ void esc_finished(tap_dance_state_t *state, void *user_data) {
             break;
         case TD_SINGLE_HOLD:
             layer_lock_on(1);
-            add_mods(MOD_MASK_SHIFT);
+            register_mods(MOD_MASK_SHIFT);
             break;
         case TD_DOUBLE_SINGLE_TAP:
             tap_code(KC_ESC);
@@ -312,7 +315,7 @@ void esc_reset(tap_dance_state_t *state, void *user_data) {
     switch (esctap_state.state) {
         case TD_SINGLE_HOLD:
             layer_lock_off(1);
-            del_mods(MOD_MASK_SHIFT);
+            unregister_mods(MOD_MASK_SHIFT);
             break;
         case TD_DOUBLE_SINGLE_TAP:
             unregister_code(KC_ESC);
